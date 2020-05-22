@@ -28,7 +28,7 @@ t = path.T;
 % Safe segment times from the most feasible iteration
 tFeasible = t;
 
-nrIterations = 50;
+nrIterations = 1;
 stepSize = 0.1;
 
 for it = 1:nrIterations
@@ -52,20 +52,20 @@ for it = 1:nrIterations
     % Check feasibility of each segment, adjusting time if necessary
     %
     
-    feasible = evalTrajFeasibility(traj, t, P);
-    feasible = [1 0];
-    for i = 2:length(feasible)
-        if feasible(i) == 1
-            % save feasible times for a rainy day
-            tFeasible(i) = t(i);
-            
-            % decrease waypoint time
-            t(i) = t(i) - stepSize;
-        else
-            % increase waypoint time
-            t(i) = t(i) + stepSize;
-        end
-    end
+%     feasible = evalTrajFeasibility(traj, t, P);
+%     feasible = [1 1];
+%     for i = 2:length(feasible)
+%         if feasible(i) == 1
+%             % save feasible times for a rainy day
+%             tFeasible(i) = t(i);
+%
+%             % decrease waypoint time
+%             t(i) = t(i) - stepSize;
+%         else
+%             % increase waypoint time
+%             t(i) = t(i) + stepSize;
+%         end
+%     end
     
 end
 end

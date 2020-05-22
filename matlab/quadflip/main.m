@@ -72,8 +72,9 @@ path.T = [0 0.5 1.0 1.5];
 % path: [x xd xdd xddd xdddd; y yd ... ; z zd ...]
 path.s = [0 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0];
 path.wps = [];
+path.wps(:,:,1) = [3 0 0; 0 0 0; 1 0 0];
 path.e = [6 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0];
-path.T = [0 5];
+path.T = [0 2 4];
 
 [traj, ~] = trajgen(path, P);
 
