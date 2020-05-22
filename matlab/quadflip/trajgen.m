@@ -70,60 +70,60 @@ for it = 1:nrIterations
 end
 end
 
-function [alphas, T] = polySolver(X,Y,Z,n,N,P)
-    alphas = zeros(3,10);
-    
-    t0 = 0;
-    tf = 10;
-    
-    t_start = t0;
-    t_end = tf*2;
-    t_mid = tf;
-    
-    iters = 1;
-    
-    for i = 1:iters
-        eps = 0;
-        ts = t0 - eps;
-        te = t_mid + eps;
-        if n == 1, ts = t0; end
-        if n == N, te = t_mid; end
-        A = get9PolySegmentMatrix(ts, te);
-
-        b = [X; Y; Z]';
-        alphas(1,:) = A\b(:,1);
-        alphas(2,:) = A\b(:,2);
-        alphas(3,:) = A\b(:,3);
-
-        % check actuator feasibility
-        err = calcActuatorFeasibility(alphas, 1, diag(P.J), 0.1, 0, 30, pi/6, t_mid);
-%         err = 0;
-
-        if err == 1
-            t_start = t_mid;
-            t_mid = (t_mid + t_end) / 2;
-        else 
-            t_end = t_mid;
-            t_mid = (t_mid + t_start) / 2;
-        end
-    end
-    
-    % set the tf to the answer
-    if err == 1
-        tf = t_end;
-    else 
-        tf = t_mid;
-    end
-    
-    % recalculate poly coeffs one last time
-    A = get9PolySegmentMatrix(t0, tf);
-    b = [X; Y; Z]';
-    alphas(1,:) = A\b(:,1);
-    alphas(2,:) = A\b(:,2);
-    alphas(3,:) = A\b(:,3);
-    
-    T = tf;
-end
+% function [alphas, T] = polySolver(X,Y,Z,n,N,P)
+%     alphas = zeros(3,10);
+%     
+%     t0 = 0;
+%     tf = 10;
+%     
+%     t_start = t0;
+%     t_end = tf*2;
+%     t_mid = tf;
+%     
+%     iters = 1;
+%     
+%     for i = 1:iters
+%         eps = 0;
+%         ts = t0 - eps;
+%         te = t_mid + eps;
+%         if n == 1, ts = t0; end
+%         if n == N, te = t_mid; end
+%         A = get9PolySegmentMatrix(ts, te);
+% 
+%         b = [X; Y; Z]';
+%         alphas(1,:) = A\b(:,1);
+%         alphas(2,:) = A\b(:,2);
+%         alphas(3,:) = A\b(:,3);
+% 
+%         % check actuator feasibility
+%         err = calcActuatorFeasibility(alphas, 1, diag(P.J), 0.1, 0, 30, pi/6, t_mid);
+% %         err = 0;
+% 
+%         if err == 1
+%             t_start = t_mid;
+%             t_mid = (t_mid + t_end) / 2;
+%         else 
+%             t_end = t_mid;
+%             t_mid = (t_mid + t_start) / 2;
+%         end
+%     end
+%     
+%     % set the tf to the answer
+%     if err == 1
+%         tf = t_end;
+%     else 
+%         tf = t_mid;
+%     end
+%     
+%     % recalculate poly coeffs one last time
+%     A = get9PolySegmentMatrix(t0, tf);
+%     b = [X; Y; Z]';
+%     alphas(1,:) = A\b(:,1);
+%     alphas(2,:) = A\b(:,2);
+%     alphas(3,:) = A\b(:,3);
+%     
+%     T = tf;
+% end
 
 function traj = getTraj(alphas, Tdurs, P)
 %GETTRAJ Generate a trajectory from polynomial coefficients
