@@ -1,5 +1,5 @@
-function feasible = evalTrajFeasibility(traj, t, P)
-%EVALTRAJFEASIBILITY Summary of this function goes here
+function feasible = evalTrajDynFeasibility(traj, t, P)
+%EVALTRAJDYNFEASIBILITY Determine if each segment is dynamically feasible
 %   Detailed explanation goes here
 
 % number of trajectory segments

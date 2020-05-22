@@ -52,7 +52,7 @@ for it = 1:nrIterations
     % Check feasibility of each segment, adjusting time if necessary
     %
     
-%     feasible = evalTrajFeasibility(traj, t, P);
+%     feasible = evalTrajDynFeasibility(traj, t, P);
 %     feasible = [1 1];
 %     for i = 2:length(feasible)
 %         if feasible(i) == 1
