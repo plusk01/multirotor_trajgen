@@ -1,4 +1,4 @@
-function feasible = evalTrajKinFeasibility(traj, t, P)
+function [feasible, d] = evalTrajKinFeasibility(traj, t, P)
 %EVALTRAJDYNFEASIBILITY Determine if each segment is dynamically feasible
 %   Detailed explanation goes here
 
@@ -7,6 +7,9 @@ Nsegs = length(t)-1;
 
 % keep track of the feasibility of each segment
 feasible = zeros(1,Nsegs);
+
+% step directions
+d = ones(1,Nsegs);
 
 % keep track of segment start index
 start = 1;
@@ -23,6 +26,8 @@ for s = 1:Nsegs
                     all(all(abs(seg.j) < P.jmax)) & ...
                     all(all(abs(seg.s) < P.smax));
     
+%     d(s) = sign(seg.s(1));
+                
     % cue up next start index
     start = traj.sidx(s) + 1;
 end

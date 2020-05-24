@@ -46,8 +46,8 @@ P.minRmag = 0.1;
 % kinematic feasibility parameters
 P.vmax = 4;
 P.amax = 2;
-P.jmax = 2;
-P.smax = 2;
+P.jmax = 3;
+P.smax = 3;
 
 % -------------------------------------------------------------------------
 % Trajectory Generation
@@ -79,10 +79,13 @@ path.T = [0 0.5 1.0 1.5];
 path.s = [0 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0];
 path.wps = [];
 % path.wps(:,:,1) = [1.5 nan nan; 0 0 0; 0.5 nan nan];
-path.wps(:,:,1) = [3 0 0; 0 0 0; 1 0 0];
+% path.wps(:,:,1) = [1.5 0 0; 0 0 0; 0 0 0];
+path.wps(:,:,1) = [3 0 0; 0 0 0; 0 0 0];
+% path.wps(:,:,3) = [3 0 0; 1.5 0 0; 0 0 0];
+% path.wps(:,:,4) = [3 0 0; 3 0 0; 0 0 0];
 % path.wps(:,:,1) = [3 nan nan; 0 nan nan; 0 nan nan];
-path.e = [6 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0];
-path.T = [0 1 2];
+path.e = [3 0 0 0 0; 3 0 0 0 0; 0 0 0 0 0];
+path.T = [0 2 4]*2;
 
 [traj, ~] = trajgen(path, P);
 

@@ -28,10 +28,17 @@ t = path.T;
 % Safe segment times from the most feasible iteration
 tFeasible = t;
 
-nrIterations = 50;
+% lock traj times in as they become optimal
+locked = zeros(N,1);
+lastfeasible = zeros(N,1);
+
+nrIterations = 1;
 stepSize = 0.1;
 
 for it = 1:nrIterations
+    
+    % if all segments are optimized, there is nothing more to do
+    if all(locked==1), break; end
 
     fprintf('\n-- Iteration %d --\n\n', it);
     
@@ -52,11 +59,21 @@ for it = 1:nrIterations
     % Check feasibility of each segment, adjusting time if necessary
     %
     
-    feasible = evalTrajKinFeasibility(traj, t, P);
+    [feasible, d] = evalTrajKinFeasibility(traj, t, P);
     for s = 1:length(feasible)
+        
+        if it > 1 && feasible(s) == 1 && lastfeasible(s) == 0
+            if s > 1 && locked(s-1) == 1 || s == 1
+                locked(s) = 1;
+            end
+        end
+        
+        % if this segment is optimized, nothing to do.
+        if locked(s) == 1, continue; end
+        
         % the end time of the segment
         j = s + 1;
-        if feasible(s) == 1
+         if feasible(s) == 1
             % save feasible times for a rainy day
             tFeasible(j) = t(j);
 
@@ -64,9 +81,12 @@ for it = 1:nrIterations
             t(j:end) = t(j:end) - stepSize;
         else
             % increase waypoint time
-            t(j:end) = t(j:end) + stepSize;
+            t(j:end) = t(j:end) +  stepSize;
         end
     end
+    lastfeasible = feasible;
+    t
+    locked'
 end
 end
 
