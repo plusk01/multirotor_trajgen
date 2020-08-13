@@ -1,4 +1,4 @@
 Trajectory Generation
 =====================
 
-what i said up there ^^
+Implementations, examples, and resources for multirotor trajectory generation.
