@@ -5,7 +5,14 @@ Given a set of configuration points, this code generates a trajectory that is ki
 
 ## Example
 
-![blendxyz](.assets/blend_xyz.png)
+<p float="left">
+<img src=".assets/blend_xyz.png" width="49%" />
+<img src=".assets/blend_z.png" width="49%" />
+</p>
+<p float="left">
+<img src=".assets/blend_x.png" width="49%" />
+<img src=".assets/blend_y.png" width="49%" />
+</p>
 
 ## Resources
 
