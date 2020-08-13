@@ -1,24 +1,41 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% "Turning Paths Into Trajectories Using Parabolic Blends"
+% T. Kunz and M. Stilman, GTech Tech Report, 2011.
+%
+%
+% Parker Lusk
+% 12 Aug 2020
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear, clc;
 
-q = [1 2.5 2 0.5];
-vmax = 1;
-amax = 0.5;
+% -------------------------------------------------------------------------
+% Path Definition
 
-% Solve for path timing
-[delT, tb] = solveTiming(q, vmax, amax);
+q = [1 2.5 2 3.5];
+vmax = 0.4;
+amax = 0.8;
+alpha = 0.8; % heuristic "line search" type parameter 0<alpha<1
 
-q = [1 2.5 2 0.5];
-delT = [1.5 2 1.5]*3;
-tb = [2 4 2 1];
+% -------------------------------------------------------------------------
+% Time allocation
+
+if 1
+    % Automatic time allocation to turn path into trajectory
+    [delT, tb] = solveTiming(q, vmax, amax, alpha);
+else
+    % Manual specification of trajectory from path
+    delT = [1.5 2 1.5]*3;
+    tb = [2 4 2 1];
+end
+
+% -------------------------------------------------------------------------
+% Create Trajectory from Linear Path with Parabolic Blends
 
 n = size(q,2);
 
-% Blend a piece-wise linear path
-
-
-v = diff(q) ./ delT
-a = diff([0 v 0]) ./ tb
-
+% determine the higher-order derivatives at the waypoints
+v = diff(q) ./ delT;
+a = diff([0 v 0]) ./ tb;
 
 % check blend phase constraint, eq 4
 lhs = tb(1:end-1) + tb(2:end);
@@ -32,10 +49,12 @@ T = zeros(1, n);
 for i = 1:n
     T(i) = tb(1)/2 + sum(delT(1:i-1));
 end
-T
 
 % total duration of traj
 tf = T(n) + tb(n)/2;
+
+% -------------------------------------------------------------------------
+% Visualization
 
 % time vector
 t = linspace(0,tf,1000);
@@ -52,9 +71,15 @@ subplot(313); hold on; grid on;
 xlabel('Time [s]'); ylabel('qddot [m/s/s]');
 plot(t, qtddot(t,T,q,v,a,tb));
 
+% Error at waypoints:
+err = abs(q - qt(T,T,q,v,a,tb))
+max(err)
+
+% -------------------------------------------------------------------------
+% Helpers
+
 function qq = qt(t, T, q, v, a, tb)
 
-n = size(q,2);
 qq = zeros(1,length(t));
 
 lhs1 = T - tb./2;
@@ -77,7 +102,6 @@ end
 
 function qq = qtdot(t, T, q, v, a, tb)
 
-n = size(q,2);
 qq = zeros(1,length(t));
 
 lhs1 = T - tb./2;
@@ -100,7 +124,6 @@ end
 
 function qq = qtddot(t, T, q, v, a, tb)
 
-n = size(q,2);
 qq = zeros(1,length(t));
 
 lhs1 = T - tb./2;
@@ -121,23 +144,67 @@ qq(I2) = 0;
 
 end
 
-function [delT, tb] = solveTiming(q, vmax, amax)
+function [delT, tb] = solveTiming(q, vmax, amax, alpha)
 
 m = size(q, 1);
 n = size(q, 2);
 
 delT = zeros(1, n-1);
-tb = zeros(1, n-1);
+tb = inf(1, n);
 
 for i = 1:length(delT)
-    
     % linear segment timing
     % this linear segment takes as long as the slowest DoF
     delT(i) = maxdof(q(:,i+1), q(:,i), vmax); % eq 21
-    
-    % blend phase timing    
 end
 
+% initialize vel factors
+f = ones(1,n-1);
+
+it = 0;
+
+while 1
+
+    % update times of linear segments
+    delT = delT./f;
+
+    % create velocities
+    v = diff(q) ./ delT;
+
+    vpad = [0 v 0];
+
+    for i = 1:length(tb)
+        % blend phase timing
+        tb(i) = maxdof(vpad(:,i+1), vpad(:,i), amax);
+    end
+
+    % check blend phase constraint, eq 4
+    % n.b., we don't care about the rhs of last waypoint, so len(check) == n-1
+    lhs = tb(1:end-1) + tb(2:end);
+    check = lhs<=2*delT
+
+    if all(check), break; end
+
+    delTpad = [inf delT];
+    for i = 1:(n-1)
+        if check(i) == 0
+            f(i) = alpha*f(i);
+%             f(i) = sqrt( min(delTpad(i),delTpad(i+1))./tb(i) );
+
+%             if i>1
+%                 f(i-1) = min(f(i-1),f(i));
+%             end
+
+            % make sure 0 < f <= 1
+            if f(i) <= 0, f(i) = 0.01; end
+            if f(i) > 1, f(i) = 1; end
+        end
+    end
+
+    it = it + 1;
+    if it>100, break; end
+end
+it
 end
 
 function T = maxdof(x1, x0, xdot)
