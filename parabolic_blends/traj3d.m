@@ -12,8 +12,8 @@ clear, clc;
 % Path Definition
 
 q = [0 0 0; 0 0 1; -1 1 1; 1.2 1.5 1; 1.3 1.85 1; 1.3 1.85 2.2; 2.7 2.7 2.7]';
-vmax = [1 1 1]'*0.4;
-amax = [1 1 1]'*0.8;
+vmax = [1 1 1]'*1;
+amax = [1 1 1]'*2;
 alpha = 0.8; % heuristic "line search" type parameter 0<alpha<1
 
 % -------------------------------------------------------------------------
@@ -74,7 +74,7 @@ for i = 1:m
     figure(1+i), clf;
     subplot(311); hold on; grid on; title(d);
     xlabel('Time [s]'); ylabel(['p_' d ' [m]']);
-    plot(t, p(i,:));
+    plot(t, p(i,:),'linewidth',2);
     plot(T, q(i,:), 'k'); scatter(T, q(i,:), 'k', 'filled');
     subplot(312); hold on; grid on;
     xlabel('Time [s]'); ylabel('v_x [m/s]');

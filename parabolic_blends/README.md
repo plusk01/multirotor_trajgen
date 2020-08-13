@@ -1,6 +1,11 @@
 Turning Paths Into Trajectories Using Parabolic Blends
 ======================================================
 
+Given a set of configuration points, this code generates a trajectory that is kinematically feasible w.r.t max velocity and acceleration constraints.
+
+## Example
+
+![blendxyz](.assets/blend_xyz.png)
 
 ## Resources
 
