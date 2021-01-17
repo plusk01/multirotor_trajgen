@@ -12,6 +12,8 @@ clear, clc;
 % Path Definition
 
 q = [0 0 0; 0 0 1; -1 1 1; 1.2 1.5 1; 1.3 1.85 1; 1.3 1.85 2.2; 2.7 2.7 2.7]';
+% q = [0 0 0; 0 0 1; 1 2 1; 1 0.5 1; 1 0.7 1; 1 0.8 1; 1 0.7 1; 1 0.5 1; 1 2 1]';
+% q = [1 0.7 1; 1.2 0.75 1; 1 0.8 1]';
 vmax = [1 1 1]'*1;
 amax = [1 1 1]'*2;
 alpha = 0.8; % heuristic "line search" type parameter 0<alpha<1
@@ -78,7 +80,7 @@ for i = 1:m
     plot(T, q(i,:), 'k'); scatter(T, q(i,:), 'k', 'filled');
     subplot(312); hold on; grid on;
     xlabel('Time [s]'); ylabel('v_x [m/s]');
-    plot(t, pdot(i,:));
+    plot(t, pdot(i,:));   
     subplot(313); hold on; grid on;
     xlabel('Time [s]'); ylabel('a_x [m/s/s]');
     plot(t, pddot(i,:));
@@ -94,6 +96,10 @@ max(err)
 
 function qq = qt(t, T, q, v, a, tb)
 
+%
+% (--*--)------(--*--)---(---*---)----(---*---)(-*-)--------(-*-)--(--*--)
+%
+
 m = size(q,1);
 qq = zeros(m,length(t));
 
@@ -102,8 +108,8 @@ rhs1 = T + tb./2;
 lhs2 = rhs1(1:end-1);
 rhs2 = lhs1(2:end);
 
-mask1 = lhs1 <= t' & t' <= rhs1;
-mask2 = lhs2 <= t' & t' <= rhs2;
+mask1 = lhs1 <= t' & t' <= rhs1; % if in blend (-/+) phase
+mask2 = lhs2 <= t' & t' <= rhs2; % if in linear phase
 [I1,J1] = find(mask1);
 [I2,J2] = find(mask2);
 
@@ -225,14 +231,6 @@ it
 end
 
 function T = maxdof(x1, x0, xdot)
-
-m = size(x1,1);
-
-T = 0;
-for j = 1:m
-    t = abs(x1(j) - x0(j))/xdot(j);
-    if t > T
-        T = t;
-    end
-end
+t = abs(x1 - x0) ./ xdot;
+T = max(t);
 end
